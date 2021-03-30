@@ -1,11 +1,12 @@
-﻿using System;
+﻿using HotelListing.Api;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
-namespace HotelListing.Api.Controllers
+namespace HotelListing.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -26,6 +27,7 @@ namespace HotelListing.Api.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            _logger.LogInformation("Accessed Weather Forecast");
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
