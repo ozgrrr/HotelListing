@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using HotelListing.Api;
 using HotelListing.Api.Configurations;
 using HotelListing.Api.Data;
@@ -39,6 +40,13 @@ namespace HotelListing
                 options.UseNpgsql(Configuration.GetConnectionString("postgreConnection"))
             );
 
+            services.AddMemoryCache();
+
+            services.ConfigureRateLimiting();
+            services.AddHttpContextAccessor();
+
+            services.ConfigureHttpCacheHeaders();
+
             services.AddAuthentication();
             services.ConfigureIdentity();
             services.ConfigureJWT(Configuration);
@@ -64,8 +72,15 @@ namespace HotelListing
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Hotel Listing", Version = "v1" });
             });
 
-            services.AddControllers().AddNewtonsoftJson(opt =>
+            services.AddControllers(config => {
+                config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+                {
+                    Duration = 120
+                });
+            }).AddNewtonsoftJson(opt =>
                 opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            services.ConfigureVersioning();
 
         }
 
@@ -81,9 +96,15 @@ namespace HotelListing
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelListing v1"));
             }
 
+            app.ConfigureExceptionHandler();
+
             app.UseHttpsRedirection();
 
             app.UseCors("AllowAll");
+
+            app.UseResponseCaching();
+            app.UseHttpCacheHeaders();
+            app.UseIpRateLimiting();
 
             app.UseRouting();
 
