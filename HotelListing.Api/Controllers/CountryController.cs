@@ -41,7 +41,7 @@ namespace HotelListing.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllCountries()
         {
-            var countries = await _unitOfWork.Countries.GetAll();
+            var countries = await _unitOfWork.Countries.GetAll(null, p => p.OrderBy(s => s.Name));
             var results = _mapper.Map<IList<CountryDTO>>(countries);
             return Ok(results);
         }
