@@ -33,7 +33,7 @@ namespace HotelListing.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllHotels()
         {
-            var hotels = await _unitOfWork.Hotels.GetAll();
+            var hotels = await _unitOfWork.Hotels.GetAll(null, p => p.OrderBy(s => s.Rating));
             var results = _mapper.Map<IList<HotelDTO>>(hotels);
             return Ok(results);
         }
